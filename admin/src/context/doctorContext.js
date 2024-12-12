@@ -8,6 +8,7 @@ const DoctorContextProvider = (props) => {
   const [dToken, setDToken] = useState(localStorage.getItem('dToken') || '');
   const [appointments, setAppointments] = useState([]);
   const [dashboard, setDashboard] = useState([]);
+  const [docData, setDocData] = useState([]);
 
   const [loading, setLoading] = useState(false); // Add loading state
   const Backend_url = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
@@ -101,6 +102,23 @@ const DoctorContextProvider = (props) => {
       setLoading(false); // End loading state
     }
   }, [dToken, Backend_url]);
+//  get doctor profile
+const loadDoctorProfileData = async () => {
+  try {
+    const { data } = await axios.get(`${Backend_url}/api/doctor/profile`, {
+      headers: { Authorization: `Bearer ${dToken}` },
+    });
+    if (data.success) {
+      console.log("Doctor Profile:", data.doctorData);
+      setDocData(data.doctorData);
+    } else {
+      toast.error(data.message || "Failed to fetch doctor profile");
+    }
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    toast.error(error.response?.data?.message || "Failed to fetch doctor profile");
+  }
+};
 
   const value = {
     dToken,
@@ -112,7 +130,9 @@ const DoctorContextProvider = (props) => {
     loading,
     getDashdata,
     dashboard,
-    setDashboard
+    setDashboard,
+    loadDoctorProfileData,
+    docData,
   };
 
   return (

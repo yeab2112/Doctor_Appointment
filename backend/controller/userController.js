@@ -109,7 +109,7 @@ const getProfile = async (req, res) => {
   }
 };
 
-;
+
 
 // Update user profile
 
