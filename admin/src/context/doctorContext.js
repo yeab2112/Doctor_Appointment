@@ -133,6 +133,7 @@ const loadDoctorProfileData = async () => {
     setDashboard,
     loadDoctorProfileData,
     docData,
+    Backend_url 
   };
 
   return (

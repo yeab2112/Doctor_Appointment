@@ -4,7 +4,7 @@ import { AppContext } from "../../context/appContext";
 import cross from "../../asset/cross.png";
 
 function AllAppointment() {
-  const { aToken, appointments, getAppointment, cancelAppointment } = useContext(AdminContext);
+  const { aToken, appointments, getAppointment, cancelAppointment, completeAppointment } = useContext(AdminContext);
   const { calculateAge } = useContext(AppContext);
 
   // Fetch appointments only when `aToken` changes
@@ -61,27 +61,30 @@ function AllAppointment() {
                 </div>
                 <p className="w-24 text-center">${appointment.amount || "N/A"}</p>
                 <p className="w-32 text-center">
-                  <button
-                    className="bg-red-200 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                    aria-label={`Delete appointment ${appointment._id}`}
-                    onClick={() => {
-                      if (!appointment.cancelled) {
+                  {/* Cancel Button */}
+                  {!appointment.cancelled && !appointment.isCompleted && (
+                    <button
+                      className="bg-red-200 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                      aria-label={`Cancel appointment ${appointment._id}`}
+                      onClick={() => {
                         cancelAppointment(appointment._id); // Cancel the appointment
-                      } else {
-                        alert("This appointment has already been canceled.");
-                      }
-                    }}
-                  >
-                    {appointment.cancelled ? (
-                      "Canceled"
-                    ) : (
+                      }}
+                    >
                       <img
                         src={cross}
-                        alt="Delete"
-                        className="w-5 h-5 text-white hover:text-red-500 inline" // Adjusted size and color
+                        alt="Cancel"
+                        className="w-5 h-5 text-white hover:text-red-500 inline"
                       />
-                    )}
-                  </button>
+                    </button>
+                  )}
+                  {/* Completed Label */}
+                  {appointment.isCompleted && (
+                    <span className="text-green-500 text-sm mt-2">Completed</span>
+                  )}
+                  {/* Canceled Label */}
+                  {appointment.cancelled && !appointment.isCompleted && (
+                    <span className="text-red-500 text-sm mt-2">Canceled</span>
+                  )}
                 </p>
               </div>
             ))

@@ -98,6 +98,33 @@ const allDoctors = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal Server Error" }); 
   }
 };
+// change avaliablity
+const changeAvailability = async (req, res) => {
+  try {
+    const { doctorId, available } = req.body;
+
+    if (!doctorId || available === undefined) {
+      return res.status(400).json({ message: 'Doctor ID and availability are required' });
+    }
+
+    // Find the doctor by ID and update the availability
+    const doctor = await doctorModel.findByIdAndUpdate(
+      doctorId,
+      { available },
+      { new: true }
+    );
+
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    return res.status(200).json({ message: 'Doctor availability updated', doctor });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 const appintmmentAdmin = async (req, res) => {
   try {
 
@@ -184,4 +211,6 @@ const dashData={
 ;
 
 
-export { addDoctor, adminLogin,allDoctors ,appintmmentAdmin,appointmentCancel,adminDashboard} ;
+export { addDoctor, adminLogin,allDoctors ,changeAvailability
+  ,appintmmentAdmin,appointmentCancel,
+  adminDashboard} ;

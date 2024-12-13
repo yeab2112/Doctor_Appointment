@@ -94,6 +94,36 @@ const AdminContextProvider = ({ children }) => {
     }
   }, [aToken, Backend_url]);
 
+  // Change doctor's availability
+  const changeAvailability = async (doctorId) => {
+    const doctorToUpdate = doctors.find((doctor) => doctor._id === doctorId);
+    if (!doctorToUpdate) return;
+
+    const newAvailability = !doctorToUpdate.available; // Toggle availability
+
+    try {
+      const response = await axios.post(
+        `${Backend_url}/api/admin//change-available`,
+        { doctorId, available: newAvailability },
+        {
+          headers: { Authorization: `Bearer ${aToken}` },
+        }
+      );
+      if (response.status === 200) {
+        // Update doctors state with the new availability
+        const updatedDoctors = doctors.map((doctor) =>
+          doctor._id === doctorId ? { ...doctor, available: newAvailability } : doctor
+        );
+        setDoctors(updatedDoctors);
+        toast.success('Availability updated successfully');
+      } else {
+        toast.error('Failed to update availability');
+      }
+    } catch (error) {
+      toast.error('Error updating availability');
+    }
+  };
+
   // Context value
   const value = {
     aToken,
@@ -105,6 +135,7 @@ const AdminContextProvider = ({ children }) => {
     cancelAppointment,
     getDashBoard,
     dashData,
+    changeAvailability, // Provide the function to toggle availability
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

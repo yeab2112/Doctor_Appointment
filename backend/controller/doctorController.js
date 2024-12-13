@@ -154,17 +154,16 @@ const doctorLogin = async (req, res) => {
     };
     //  get doctor profile
 
+
     const getProfile = async (req, res) => {
       try {
         const docId = req.docId;
-        console.log("Extracted docId:", docId); // Debugging
     
         if (!docId) {
           return res.status(400).json({ success: false, message: "Doctor ID not provided" });
         }
     
         const doctor = await doctorModel.findById(docId).select("-password");
-        console.log("Doctor from database:", doctor); // Debugging
     
         if (!doctor) {
           return res.status(404).json({ success: false, message: "Doctor not found" });
@@ -182,25 +181,32 @@ const doctorLogin = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { docId, address, fees, available,  } = req.body;
+    const docId = req.docId;
 
-   
+    const { address, fees, available } = req.body;
 
-    // Validate other required fields
-    if (!docId || !fees || !available  || !address) {
-      return res.status(400).json({ success: false, message: "Missing required details" });
+    if (!docId) {
+      return res.status(400).json({ success: false, message: "Doctor ID not provided" });
     }
 
-    const doctor = await docId.findById(docId);
+    // if (!fees || !available || !address) {
+    //   return res.status(400).json({ success: false, message: "Missing required details" });
+    // }
+
+    const doctor = await doctorModel.findById(docId);
     if (!doctor) {
       return res.status(404).json({ success: false, message: "Doctor not found" });
     }
-await doctorModel.findByIdAndUpdate(docId,{fees,address,available})
-    
-return res.status(200).json({ success: true,message: "Doctor profile updated" });
-} catch (error) {
-  console.error(error.message);
-}}
+
+    await doctorModel.findByIdAndUpdate(docId, { fees, address, available });
+
+    return res.status(200).json({ success: true, message: "Doctor profile updated" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
     
 export{changeAvlablity,doctorList,doctorLogin
    ,doctorAppintmment,appointmentCompleted,

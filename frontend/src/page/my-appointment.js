@@ -8,11 +8,10 @@ function MyAppointment() {
   const { token, getDoctors } = useContext(AppContext);
   const [appointments, setAppointments] = useState([]);
   const [status, setStatus] = useState('Verifying payment...');
-  
+
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const txRef = queryParams.get('tx_ref'); // Assuming the tx_ref is passed as a query param
-  console.log(txRef);
+  const txRef = queryParams.get('tx_ref');
 
   const getMyAppointment = useCallback(async () => {
     if (!token) {
@@ -26,8 +25,6 @@ function MyAppointment() {
         'http://localhost:5001/api/user/get-appointment',
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      console.log('Fetched appointments:', data.appointments);
 
       if (data.success && Array.isArray(data.appointments)) {
         setAppointments(data.appointments);
@@ -89,15 +86,17 @@ function MyAppointment() {
     }
   };
 
-  // UseEffect to verify the payment once txRef is available
   useEffect(() => {
     const verifyPayment = async () => {
-      if (!txRef) return; // Exit early if txRef doesn't exist
+      if (!txRef) return;
 
       try {
-        const response = await axios.post('http://localhost:5000/api/verify', { txRef }, { headers: { Authorization: `Bearer ${token}` } });
+        const response = await axios.post(
+          'http://localhost:5001/api/verify',
+          { txRef },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        // Update UI based on verification result
         if (response.data.status === 'success') {
           setStatus('Payment successful!');
         } else {
@@ -110,13 +109,12 @@ function MyAppointment() {
     };
 
     verifyPayment();
-  }, [txRef, token]); // Trigger payment verification if txRef exists
+  }, [txRef, token]);
 
   return (
     <div className="container mx-auto p-4">
       <p className="text-2xl font-bold text-center mb-4">My Appointments</p>
 
-      {/* Display the payment verification status */}
       {status && <p className="text-center text-xl text-gray-600">{status}</p>}
 
       <div className="flex flex-col gap-6">
@@ -128,53 +126,57 @@ function MyAppointment() {
               {/* Image Section */}
               <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-4 w-full sm:w-48">
                 <img
-                  src={item.docId.image || '/path/to/default-image.jpg'}
+                  src={item.docId?.image || '/path/to/default-image.jpg'}
                   alt={item.name || 'Appointment Image'}
                   className="w-full h-auto object-cover bg-slate-600 rounded-lg"
                 />
               </div>
 
+              {/* Appointment Details */}
               <div className="flex-grow mb-4 sm:mb-0">
                 <p className="text-lg font-semibold text-gray-800">{item.docId?.name || 'No Name'}</p>
                 <p className="text-gray-500">{item.docId?.speciality || 'No Specialty'}</p>
-                <p className="text-gray-600 font-medium mt-2">Address</p>
-                <p className="text-gray-500">
-                  {item.docId?.address?.address1 || ''} {item.docId?.address?.address2 || ''}
-                </p>
-
                 <p className="text-gray-600 font-medium mt-2">
-                  <span>Date & Time:</span> {new Date(item.date).toLocaleString()}
+                  Date & Time: {new Date(item.date).toLocaleString()}
                 </p>
                 <p className="text-gray-600 font-medium mt-2">
-                  <span>Slot Time:</span> {item.slotTime}
+                  Slot Time: {item.slotTime}
                 </p>
               </div>
 
               {/* Buttons Section */}
               <div className="flex flex-col gap-4">
-                {!item.cancelled && item.payment && (
+                {!item.cancelled && item.isCompleted && (
+                  <button className="text-green-500 px-4 py-2 rounded-lg">
+                    Appointment Completed
+                  </button>
+                )}
+
+                {!item.cancelled && item.payment && !item.isCompleted && (
                   <button disabled className="bg-green-500 text-white px-4 py-2 rounded-lg">
                     Paid
                   </button>
                 )}
-                {!item.cancelled && !item.payment && (
-                  <button
-                    onClick={() => appointmentChapaPay(item._id)}
-                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none"
-                  >
-                    Pay Online
-                  </button>
+
+                {!item.cancelled && !item.payment && !item.isCompleted && (
+                  <>
+                    <button
+                      onClick={() => appointmentChapaPay(item._id)}
+                      className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                    >
+                      Pay Online
+                    </button>
+                    <button
+                      onClick={() => cancelAppointment(item._id)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                    >
+                      Cancel
+                    </button>
+                  </>
                 )}
-                {!item.cancelled && (
-                  <button
-                    onClick={() => cancelAppointment(item._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none"
-                  >
-                    Cancel
-                  </button>
-                )}
+
                 {item.cancelled && (
-                  <button disabled className="border border-red-500 text-red-500 px-4 py-2 rounded-lg focus:outline-none">
+                  <button disabled className="border border-red-500 text-red-500 px-4 py-2 rounded-lg">
                     Appointment Canceled
                   </button>
                 )}

@@ -4,19 +4,16 @@ import profile from "../../asset/profile.png";
 import appointment from "../../asset/appointment.png";
 import patient from "../../asset/patient.png";
 import list from "../../asset/list.png";
-import cross from "../../asset/cross.png"; // Assuming this exists
 
 function Dashboard() {
-  const { getDashBoard, dashData, aToken,getAppointment ,cancelAppointment} = useContext(AdminContext);
+  const { getDashBoard, dashData, aToken, getAppointment } = useContext(AdminContext);
 
   useEffect(() => {
     if (aToken) {
       getDashBoard();
-      getAppointment ()
-       }
-  }, [aToken, getDashBoard,getAppointment]);
-
- 
+      getAppointment();
+    }
+  }, [aToken, getDashBoard, getAppointment]);
 
   return (
     dashData && (
@@ -24,9 +21,7 @@ function Dashboard() {
         {/* Overview Section */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {/* Doctors Section */}
-          <div
-            className="bg-white p-4 rounded-lg shadow-lg flex items-center cursor-pointer hover:shadow-xl hover:bg-gray-50 active:scale-95 transition-all"
-          >
+          <div className="bg-white p-4 rounded-lg shadow-lg flex items-center cursor-pointer hover:shadow-xl hover:bg-gray-50 active:scale-95 transition-all">
             <img src={profile} alt="Doctors" className="w-16 h-16 rounded-full mr-4" />
             <div>
               <p className="text-lg font-bold">{dashData.doctors || 0}</p>
@@ -35,9 +30,7 @@ function Dashboard() {
           </div>
 
           {/* Appointments Section */}
-          <div
-            className="bg-white p-4 rounded-lg shadow-lg flex items-center cursor-pointer hover:shadow-xl hover:bg-gray-50 active:scale-95 transition-all"
-          >
+          <div className="bg-white p-4 rounded-lg shadow-lg flex items-center cursor-pointer hover:shadow-xl hover:bg-gray-50 active:scale-95 transition-all">
             <img src={appointment} alt="Appointments" className="w-16 h-16 rounded-full mr-4" />
             <div>
               <p className="text-lg font-bold">{dashData.appointments || 0}</p>
@@ -46,9 +39,7 @@ function Dashboard() {
           </div>
 
           {/* Patients Section */}
-          <div
-            className="bg-white p-4 rounded-lg shadow-lg flex items-center cursor-pointer hover:shadow-xl hover:bg-gray-50 active:scale-95 transition-all"
-          >
+          <div className="bg-white p-4 rounded-lg shadow-lg flex items-center cursor-pointer hover:shadow-xl hover:bg-gray-50 active:scale-95 transition-all">
             <img src={patient} alt="Patients" className="w-16 h-16 rounded-full mr-4" />
             <div>
               <p className="text-lg font-bold">{dashData.patients || 0}</p>
@@ -66,10 +57,7 @@ function Dashboard() {
           <div className="space-y-4">
             {dashData.latestAppointments && dashData.latestAppointments.length > 0 ? (
               dashData.latestAppointments.map((item, index) => (
-                <div
-                  key={index}
-                  className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between"
-                >
+                <div key={index} className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
                   <div className="flex items-center">
                     <img
                       src={item.docId.image || profile}
@@ -86,30 +74,13 @@ function Dashboard() {
                     </div>
                   </div>
                   <div>
-                    {item.cancelled ? (
-                      <span className="text-red-500 text-sm font-semibold">Cancelled</span>
-                    ) : (
-                      <button
-                    className="bg-red-200 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                    aria-label={`Delete appointment ${item._id}`}
-                    onClick={() => {
-                      if (!item.cancelled) {
-                        cancelAppointment(item._id); // Cancel the appointment
-                      } else {
-                        alert("This appointment has already been canceled.");
-                      }
-                    }}
-                  >
-                    {appointment.cancelled ? (
-                      "Canceled"
-                    ) : (
-                      <img
-                        src={cross}
-                        alt="Delete"
-                        className="w-5 h-5 text-white hover:text-red-500 inline" // Adjusted size and color
-                      />
+                    {/* Display Completed Text */}
+                    {item.isCompleted && (
+                      <span className="text-green-500 text-sm mt-2">Completed</span>
                     )}
-                  </button>
+                    {/* Display Canceled Text only if not completed */}
+                    {!item.isCompleted && item.cancelled && (
+                      <span className="text-red-500 text-sm mt-2">Canceled</span>
                     )}
                   </div>
                 </div>
