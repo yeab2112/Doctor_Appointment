@@ -2,20 +2,20 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from './context.js'; 
 
-function RelatedDoctors({ docId, specialty }) {
+function RelatedDoctors({ docId, speciality }) {
   const [relDoc, setRelDoc] = useState([]);
   const { doctors } = useContext(AppContext);
   const navigate = useNavigate();
 
   // Filter related doctors based on specialty and exclude the current doctor
   const filterRelDoctor = useCallback(() => {
-    if (doctors?.length > 0 && specialty) {
+    if (doctors?.length > 0 && speciality) {
       const docData = doctors.filter(
-        (doc) => doc.specialty === specialty && doc._id !== docId
+        (doc) => doc.speciality === speciality && doc._id !== docId
       );
       setRelDoc(docData);
     }
-  }, [doctors, specialty, docId]);
+  }, [doctors, speciality, docId]);
   
   useEffect(() => {
     filterRelDoctor();

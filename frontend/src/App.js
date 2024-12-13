@@ -22,7 +22,7 @@ function App() {
         <Navbar />
         <Routes>
           {/* Define dynamic route correctly */}
-          <Route path='/doctors/:specialty' element={<Doctor />} /> 
+          <Route path='/doctors/:speciality' element={<Doctor />} /> 
           <Route path='/doctors' element={<Doctor />} />
 
           <Route path='/' element={<Home />} />

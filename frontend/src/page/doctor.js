@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppContext } from '../component/context';
 function Doctor() {
-  const { specialty } = useParams();
+  const { speciality } = useParams();
   const [filterDoc, setFilterDoc] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const { doctors } = useContext(AppContext)
@@ -10,9 +10,9 @@ function Doctor() {
 
   useEffect(() => {
     const applyFilter = () => {
-      if (specialty) {
+      if (speciality) {
         setFilterDoc(
-          doctors.filter(doc => doc.specialty.toLowerCase() === specialty.toLowerCase())
+          doctors.filter(doc => doc.speciality.toLowerCase() === speciality.toLowerCase())
         );
       } else {
         setFilterDoc(doctors);
@@ -20,7 +20,7 @@ function Doctor() {
     };
 
     applyFilter();
-  }, [specialty,doctors]);
+  }, [speciality,doctors]);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -41,15 +41,15 @@ function Doctor() {
             <div className="flex flex-col space-y-4">
               <p
                 className={`rounded-full py-2 px-4 text-center cursor-pointer 
-                  ${specialty === 'General_physician' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
-                onClick={() => navigate('/doctors/General_physician')}
+                  ${speciality === 'General Physician' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
+                onClick={() => navigate('/doctors/General Physician')}
               >
                 General Physician
               </p>
 
               <p
                 className={`rounded-full py-2 px-4 text-center cursor-pointer 
-                  ${specialty === 'Gynecologist' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
+                  ${speciality === 'Gynecologist' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
                 onClick={() => navigate('/doctors/Gynecologist')}
               >
                 Gynecologist
@@ -57,7 +57,7 @@ function Doctor() {
 
               <p
                 className={`rounded-full py-2 px-4 text-center cursor-pointer 
-                  ${specialty === 'Dermatologist' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
+                  ${speciality === 'Dermatologist' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
                 onClick={() => navigate('/doctors/Dermatologist')}
               >
                 Dermatologist
@@ -65,7 +65,7 @@ function Doctor() {
 
               <p
                 className={`rounded-full py-2 px-4 text-center cursor-pointer 
-                  ${specialty === 'Neurologist' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
+                  ${speciality === 'Neurologist' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
                 onClick={() => navigate('/doctors/Neurologist')}
               >
                 Neurologist
@@ -73,7 +73,7 @@ function Doctor() {
 
               <p
                 className={`rounded-full py-2 px-4 text-center cursor-pointer 
-                  ${specialty === 'Pediatricians' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
+                  ${speciality === 'Pediatricians' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
                 onClick={() => navigate('/doctors/Pediatricians')}
               >
                 Pediatricians
@@ -81,7 +81,7 @@ function Doctor() {
 
               <p
                 className={`rounded-full py-2 px-4 text-center cursor-pointer 
-                  ${specialty === 'Gastroenterologist' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
+                  ${speciality === 'Gastroenterologist' ? 'bg-blue-300 text-white' : 'bg-blue-100 text-gray-800'}`}
                 onClick={() => navigate('/doctors/Gastroenterologist')}
               >
                 Gastroenterologist
@@ -101,7 +101,7 @@ function Doctor() {
               <img src={doctor.image} alt="Doctor" className="w-full h-48 object-cover rounded-t-lg" />
               <div className="p-2">
                 <p className="text-lg font-semibold text-gray-800">{doctor.name}</p>
-                <p className="text-gray-500">{doctor.specialty}</p>
+                <p className="text-gray-500">{doctor.speciality}</p>
                 <div className="flex items-center mt-2">
                 {doctor.available ? (
                                     <span className="text-green-600 font-medium flex items-center">

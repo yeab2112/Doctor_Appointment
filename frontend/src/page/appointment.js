@@ -186,7 +186,7 @@ function Appointment() {
 
       {/* Related Doctors Section */}
       <div className="mt-8 max-w-3xl w-full">
-        <RelatedDoctors specialty={docInfo.speciality } docId={docInfo._id} />
+        <RelatedDoctors speciality={docInfo.speciality } docId={docInfo._id} />
       </div>
     </div>
   ) : (

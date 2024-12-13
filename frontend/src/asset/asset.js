@@ -13,27 +13,27 @@ import Selam from '../asset/Selam.png';
 import Melkamu from '../asset/Melkamu.png';
 export const specialtyData = [
   {
-    specialty: 'General_physician',
+    speciality: 'General Physician',
     image: General_physician
   },
   {
-    specialty: 'Gynecologist',
+    speciality: 'Gynecologist',
     image: Gynecologist
   },
   {
-    specialty: 'Dermatologist',
+    speciality: 'Dermatologist',
     image: Dermatologist
   },
   {
-    specialty: 'Neurologist',
+    speciality: 'Neurologist',
     image: Neurologist
   },
   {
-    specialty: 'Pediatrician',
+    speciality: 'Pediatricians',
     image: Pediatricians
   },
   {
-    specialty: 'Gastroenterologist',
+    speciality: 'Gastroenterologist',
     image: Gastroenterologist
   }
 ];
@@ -41,7 +41,7 @@ export const specialtyData = [
 export const Topdoctors = [
   {
     _id: 1,
-    specialty: 'Gastroenterologist',
+    speciality: 'Gastroenterologist',
     image: Dawit,
     name: "Dr. Dawit",
     experience: "4",
@@ -56,7 +56,7 @@ line2:"bolea"
   },
   {
     _id: 2,
-    specialty: 'Neurologist',
+    speciality: 'Neurologist',
     image: Solomon,
     name: "Dr. Solomon",
     experience: "3",
@@ -71,7 +71,7 @@ line2:"bolea"
   },
   {
     _id: 3,
-    specialty: 'General_physician',
+    speciality: ' General Physician',
     image: Melkamu,
     name: 'Dr. Melkamu',
     experience: "6",
@@ -85,7 +85,7 @@ line2:"bolea"
   },
   {
     _id: 4,
-    specialty: 'Dermatologist',
+    speciality: 'Dermatologist',
     image: Selam,
     name: 'Dr. Selam',
     experience: "6",
@@ -99,7 +99,7 @@ line2:"bolea"
   },
   {
     _id: 5,
-    specialty: 'Gynecologist',
+    speciality: 'Gynecologist',
     image: Tsegaye,
     name: 'Dr. Tsegaye',
     experience: "5",
@@ -113,7 +113,7 @@ line2:"bolea"
   },
   {
     _id: 6,
-    specialty: 'Neurologist',
+    speciality: 'Neurologist',
     image: Meron,
     name: 'Dr. Meron',
     experience: "5",
@@ -127,7 +127,7 @@ line2:"bolea"
   },
   {
     _id: 7,
-    specialty: 'Pediatricians',
+    speciality: 'Pediatricians',
     image: Msrak,
     
     name: 'Dr. Msrak',

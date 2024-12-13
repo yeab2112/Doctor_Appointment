@@ -16,18 +16,18 @@ const Speciality = () => {
         {specialtyData.map((item, index) => (
           <Link
             key={index}
-            to={`/doctors/${item.specialty}`}
+            to={`/doctors/${item.speciality}`}
             className="flex flex-col items-center p-4 bg-white shadow-md rounded-lg hover:bg-blue-50 transition-colors min-w-[150px]"
             onClick={() => window.scrollTo(0, 0)}
           >
             {item.image && ( 
               <img
                 src={item.image}
-                alt={`${item.specialty} icon`}
+                alt={`${item.speciality} icon`}
                 className="w-24 h-24 object-cover rounded-full mb-4"
               />
             )}
-            <p className="text-lg font-medium text-gray-700">{item.specialty}</p>
+            <p className="text-lg font-medium text-gray-700">{item.speciality}</p>
           </Link>
         ))}
       </div>

@@ -147,7 +147,7 @@ function MyAppointment() {
               {/* Buttons Section */}
               <div className="flex flex-col gap-4">
                 {!item.cancelled && item.isCompleted && (
-                  <button className="text-green-500 px-4 py-2 rounded-lg">
+                  <button className="text-green-500  border border-green-500 px-4 py-2 rounded-lg">
                     Appointment Completed
                   </button>
                 )}
