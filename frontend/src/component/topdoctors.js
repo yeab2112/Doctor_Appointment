@@ -38,7 +38,7 @@ const Topdoctor = () => {
                         />
                         <div className="p-2">
                             <p className="text-lg font-semibold text-gray-800">{doctor.name}</p>
-                            <p className="text-gray-500">{doctor.specialty}</p>
+                            <p className="text-gray-500">{doctor.speciality}</p>
                             <div className="flex items-center mt-2">
                                 {doctor.available ? (
                                     <span className="text-green-600 font-medium flex items-center">

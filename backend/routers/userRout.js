@@ -14,7 +14,7 @@ userRoutes.post('/book-appointment',authoUser, bookAppointment);
 userRoutes.post('/cancel-appointment',authoUser, cancelAppointment);
 userRoutes.post('/payment-appointment',authoUser, initiateAppointmentPayment);
 
-userRoutes.post('/payment-verification',authoUser, verifyAppointmentPayment);
+userRoutes.post('/verify', authoUser, verifyAppointmentPayment);
 
 
 

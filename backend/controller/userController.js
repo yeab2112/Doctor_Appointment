@@ -266,8 +266,8 @@ const cancelAppointment = async (req, res) => {
       return res.status(404).json({ success: false, message: "Appointment not found" });
     }
 
-    // Verify user authorization
-    if (appointmentData.userId !== userId) {
+    // Convert userId and appointmentData.userId to ObjectId for proper comparison
+    if (!appointmentData.userId.equals(userId)) {
       return res.status(403).json({ success: false, message: "Unauthorized action" });
     }
 
@@ -298,38 +298,54 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
-// Chapa API endpoint
-
-
 const CHAPA_API_URL = 'https://api.chapa.co/v1/transaction/initialize';
-const CHAPA_SECRET_KEY = process.env.CHAPA_SECRET_KEY;
+const CHAPA_SECRET_KEY = "CHASECK_TEST-Zx9WYTlcvbOsbvqOMLbDclIchCwINaHP";
 
 const initiateAppointmentPayment = async (req, res) => {
-  const { appointmentId } = req.body;
+  const { phone, currency, txRef, callbackUrl, appointmentId } = req.body;
+
+  // Ensure all required fields are present
+  if (!phone || !txRef || !callbackUrl) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Missing required fields: phone, txRef, or callbackUrl',
+    });
+  }
+
+  // Find appointment by ID
+  const appointment = await Appointment.findById(appointmentId);
+
+  if (!appointment) {
+    return res.status(404).json({ success: false, message: 'Appointment not found' });
+  }
+
+  const appointmentDate = appointment.date ? new Date(appointment.date).toISOString() : 'N/A';
+
+  const title = 'Doctor Apt'; // Title must be ≤ 16 characters
+  let description = `Payment for appointment on ${appointment.date}`;
+
+  description = description.replace(/[^a-zA-Z0-9-_ .]/g, ''); // Only allow letters, numbers, hyphens, underscores, spaces, and dots
+  description = description.slice(0, 50); // Ensure description is ≤ 50 characters
+
+  // Construct the payment data
+  const paymentData = {
+    amount: appointment.amount * 100, // Amount should be in cents
+    currency: currency || 'ETB', 
+    phone: phone,
+    tx_ref: txRef,
+     return_url: 'http://localhost:3000/my-appointment',
+    callback_url: callbackUrl,
+    appointmentDate,
+    customization: {
+      title: title,
+      description: description,
+    },
+  };
+
+  console.log('Payment Data:', paymentData); 
 
   try {
-    const appointment = await Appointment.findById(appointmentId);
-
-    if (!appointment) {
-      return res.status(404).json({ success: false, message: 'Appointment not found' });
-    }
-
-    const paymentData = {
-      amount: appointment.amount * 100, // Convert to cents if necessary
-      currency: 'ETB',
-      tx_ref: `APPT-${appointment._id}-${Date.now()}`,
-      return_url: 'http://localhost:3000/paymentSuccess',
-      callback_url: 'http://localhost:5001/api/user/verify-payment',
-      customization: {
-        title: 'Doctor Appointment',
-        description: `Payment for appointment on ${appointment.date}`,
-      },
-      meta: {
-        phone: appointment.phoneNumber,
-        appointment_date: appointment.date,
-      },
-    };
-
+    // Send request to Chapa API
     const response = await axios.post(CHAPA_API_URL, paymentData, {
       headers: {
         Authorization: `Bearer ${CHAPA_SECRET_KEY}`,
@@ -337,42 +353,47 @@ const initiateAppointmentPayment = async (req, res) => {
       },
     });
 
+    console.log('Chapa API Response:', response.data);
+
     if (response.data.status === 'success') {
       res.status(200).json({
-        success: true,
-        checkoutUrl: response.data.data.checkout_url,
+        status: 'success',
+        checkoutUrl: response.data.data.checkout_url, // Chapa's checkout URL
       });
     } else {
       res.status(400).json({
-        success: false,
-        message: response.data.message,
+        status: 'fail',
+        message: response.data.message || 'Failed to initialize payment.',
       });
     }
   } catch (error) {
-    console.error('Error initiating payment:', error);
+    console.error('Error initiating payment:', error.response ? error.response.data : error.message); // Log error response from Chapa
     res.status(500).json({
-      success: false,
+      status: 'error',
       message: 'Payment initiation failed',
       error: error.message,
     });
   }
 };
 
+
+
 const verifyAppointmentPayment = async (req, res) => {
-  const { txRef, appointmentId } = req.body;
+  const { txRef, appointmentId } = req.body;  
 
   if (!txRef) {
-    return res.status(400).json({ message: 'tx_ref is required' });
+    return res.status(400).json({ message: 'Transaction reference is required' });
   }
 
   if (!appointmentId) {
-    return res.status(400).json({ message: 'appointmentId is required' });
+    return res.status(400).json({ message: 'Appointment ID is required' });
   }
 
   try {
+    // Make a request to Chapa API to verify the transaction
     const response = await axios.get(`https://api.chapa.co/v1/transaction/verify/${txRef}`, {
       headers: {
-        Authorization: `Bearer ${CHAPA_SECRET_KEY}`,
+        Authorization: `Bearer ${CHAPA_SECRET_KEY}`,  
       },
     });
 
@@ -383,28 +404,32 @@ const verifyAppointmentPayment = async (req, res) => {
         return res.status(404).json({ message: 'Appointment not found' });
       }
 
-      appointment.payment = true;
+      // Update the payment status
+      appointment.payment = true;  // Assuming 'payment' field indicates if the payment is successful
       await appointment.save();
 
-      res.status(200).json({
+      return res.status(200).json({
         status: 'success',
-        data: response.data.data,
+        message: 'Payment verified successfully',
+        data: response.data,
       });
     } else {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: 'Payment verification failed',
       });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
+    console.error('Error verifying payment:', error);
+    return res.status(500).json({
       status: 'error',
-      message: 'Server error during payment verification',
+      message: 'Error verifying payment',
       error: error.message,
     });
   }
 };
+
+
 
 
 

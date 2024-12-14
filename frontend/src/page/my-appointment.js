@@ -2,21 +2,18 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { AppContext } from '../component/context.js';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import {  useLocation } from 'react-router-dom';
 
 function MyAppointment() {
   const { token, getDoctors } = useContext(AppContext);
   const [appointments, setAppointments] = useState([]);
-  const [status, setStatus] = useState('Verifying payment...');
+  // const navigate = useNavigate();
+  const location = useLocation(); // Using useLocation to track URL changes
 
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const txRef = queryParams.get('tx_ref');
-
+  // Fetch appointments
   const getMyAppointment = useCallback(async () => {
     if (!token) {
-      console.warn('Token is missing. Cannot fetch appointments.');
-      setAppointments([]);
+      toast.error('Token is missing. Cannot fetch appointments.');
       return;
     }
 
@@ -26,16 +23,14 @@ function MyAppointment() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (data.success && Array.isArray(data.appointments)) {
+      if (data?.success && Array.isArray(data?.appointments)) {
         setAppointments(data.appointments);
       } else {
-        toast.error(data.message || 'Failed to fetch appointments');
-        setAppointments([]);
+        toast.error(data?.message || 'Failed to fetch appointments');
       }
     } catch (error) {
       console.error('Error fetching appointments:', error);
-      toast.error(error.response?.data?.message || 'An error occurred while fetching appointments');
-      setAppointments([]);
+      toast.error(error?.response?.data?.message || 'An error occurred while fetching appointments');
     }
   }, [token]);
 
@@ -45,6 +40,7 @@ function MyAppointment() {
     }
   }, [token, getMyAppointment]);
 
+  // Cancel appointment
   const cancelAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
@@ -65,124 +61,138 @@ function MyAppointment() {
       toast.error(error.response?.data?.message);
     }
   };
+  
 
-  const appointmentChapaPay = async (appointmentId) => {
+  // Handle payment
+  const handlePayment = async (appointmentId) => {
+    const paymentData = {
+      currency: 'ETB',
+      phone: '0923547840', // Replace with actual phone number
+      txRef: `tx-${Date.now()}`, // Unique transaction reference
+      callbackUrl: 'http://localhost:5001/api/user/verify', // Backend callback URL for verification
+    };
+
     try {
       const { data } = await axios.post(
         'http://localhost:5001/api/user/payment-appointment',
-        { appointmentId },
+        { appointmentId, ...paymentData },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (data.success) {
+      if (data?.status === 'success') {
         toast.success('Redirecting to payment gateway...');
-        window.location.href = data.checkoutUrl; // Redirect to Chapa checkout page
+        window.location.href = data.checkoutUrl; // Redirect to Chapa payment page
       } else {
-        toast.error(data.message);
+        toast.error(data?.message || 'Failed to initiate payment');
       }
     } catch (error) {
       console.error('Error initiating payment:', error);
-      toast.error(error.response?.data?.message);
+      toast.error(error?.response?.data?.message || 'An error occurred while initiating payment');
     }
   };
 
+  // Payment verification logic
   useEffect(() => {
-    const verifyPayment = async () => {
-      if (!txRef) return;
+    // Using useLocation to get query parameters instead of window.location.search
+    const queryParams = new URLSearchParams(location.search);
+    const txRef = queryParams.get('tx_ref');
+    const appointmentId = queryParams.get('appointment_id');
 
+    if (!txRef || !appointmentId) {
+      toast.error('Transaction reference or appointment ID not found.');
+      return;
+    }
+
+    const verifyPayment = async () => {
       try {
-        const response = await axios.post(
-          'http://localhost:5001/api/verify',
-          { txRef },
+        const { data } = await axios.post(
+          'http://localhost:5001/api/user/verify',
+          { txRef, appointmentId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        if (response.data.status === 'success') {
-          setStatus('Payment successful!');
+        if (data?.status === 'success') {
+          toast.success('Payment verified successfully!');
         } else {
-          setStatus('Payment verification failed.');
+          toast.error(data?.message || 'Payment verification failed.');
         }
       } catch (error) {
-        setStatus('Error verifying payment.');
-        console.error(error);
+        console.error('Payment verification error:', error);
+        toast.error('An error occurred during payment verification.');
       }
     };
 
     verifyPayment();
-  }, [txRef, token]);
+  }, [location.search, token]); // Now location.search is the correct dependency
 
+  // Render appointments
   return (
     <div className="container mx-auto p-4">
       <p className="text-2xl font-bold text-center mb-4">My Appointments</p>
-
-      {status && <p className="text-center text-xl text-gray-600">{status}</p>}
 
       <div className="flex flex-col gap-6">
         {appointments.length === 0 ? (
           <p>No appointments found.</p>
         ) : (
-          appointments.map((item, index) => (
-            <div key={index} className="bg-white shadow-lg rounded-lg p-4 flex flex-col sm:flex-row items-start">
-              {/* Image Section */}
-              <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-4 w-full sm:w-48">
-                <img
-                  src={item.docId?.image || '/path/to/default-image.jpg'}
-                  alt={item.name || 'Appointment Image'}
-                  className="w-full h-auto object-cover bg-slate-600 rounded-lg"
-                />
-              </div>
+          appointments.map((item, index) => {
+            const doc = item?.docId || {}; // Fallback to an empty object
 
-              {/* Appointment Details */}
-              <div className="flex-grow mb-4 sm:mb-0">
-                <p className="text-lg font-semibold text-gray-800">{item.docId?.name || 'No Name'}</p>
-                <p className="text-gray-500">{item.docId?.speciality || 'No Specialty'}</p>
-                <p className="text-gray-600 font-medium mt-2">
-                  Date & Time: {new Date(item.date).toLocaleString()}
-                </p>
-                <p className="text-gray-600 font-medium mt-2">
-                  Slot Time: {item.slotTime}
-                </p>
-              </div>
+            return (
+              <div
+                key={index}
+                className="bg-white shadow-lg rounded-lg p-4 flex flex-col sm:flex-row items-start"
+              >
+                {/* Doctor Details */}
+                <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-4 w-full sm:w-48">
+                  <img
+                    src={doc.image || '/path/to/default-image.jpg'}
+                    alt={doc.name || 'Doctor Image'}
+                    className="w-full h-auto object-cover bg-slate-600 rounded-lg"
+                  />
+                </div>
+                <div className="flex-grow">
+                  <p className="text-lg font-semibold text-gray-800">{doc.name || 'No Name'}</p>
+                  <p className="text-gray-500">{doc.speciality || 'No Specialty'}</p>
+                  <p className="text-gray-600 font-medium mt-2">
+                    Date & Time: {new Date(item.date).toLocaleString()}
+                  </p>
+                  <p className="text-gray-600 font-medium mt-2">
+                    Slot Time: {item.slotTime || 'N/A'}
+                  </p>
+                </div>
 
-              {/* Buttons Section */}
-              <div className="flex flex-col gap-4">
-                {!item.cancelled && item.isCompleted && (
-                  <button className="text-green-500  border border-green-500 px-4 py-2 rounded-lg">
-                    Appointment Completed
-                  </button>
-                )}
-
-                {!item.cancelled && item.payment && !item.isCompleted && (
-                  <button disabled className="bg-green-500 text-white px-4 py-2 rounded-lg">
-                    Paid
-                  </button>
-                )}
-
-                {!item.cancelled && !item.payment && !item.isCompleted && (
-                  <>
-                    <button
-                      onClick={() => appointmentChapaPay(item._id)}
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-                    >
-                      Pay Online
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-4">
+                  {!item.cancelled && item.payment && !item.isCompleted && (
+                    <button disabled className="bg-green-500 text-white px-4 py-2 rounded-lg">
+                      Paid
                     </button>
-                    <button
+                  )}
+                  {!item.cancelled && !item.payment && !item.isCompleted && (
+                    <>
+                      <button
+                        onClick={() => handlePayment(item._id)} // Payment functionality
+                        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                      >
+                        Pay Online
+                      </button>
+                      <button
                       onClick={() => cancelAppointment(item._id)}
                       className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                     >
                       Cancel
                     </button>
-                  </>
-                )}
-
-                {item.cancelled && (
-                  <button disabled className="border border-red-500 text-red-500 px-4 py-2 rounded-lg">
-                    Appointment Canceled
-                  </button>
-                )}
+                    </>
+                  )}
+                  {item.cancelled && (
+                    <button disabled className="border border-red-500 text-red-500 px-4 py-2 rounded-lg">
+                      Appointment Canceled
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
