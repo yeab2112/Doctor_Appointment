@@ -335,6 +335,7 @@ const initiateAppointmentPayment = async (req, res) => {
     tx_ref: txRef,
      return_url: 'http://localhost:3000/my-appointment',
     callback_url: callbackUrl,
+    appointmentId,
     appointmentDate,
     customization: {
       title: title,
@@ -359,8 +360,13 @@ const initiateAppointmentPayment = async (req, res) => {
       res.status(200).json({
         status: 'success',
         checkoutUrl: response.data.data.checkout_url, // Chapa's checkout URL
+        appointmentId, // Include appointmentId
+        tx_ref:txRef,         // Include txRef
       });
-    } else {
+    }
+    
+      
+     else {
       res.status(400).json({
         status: 'fail',
         message: response.data.message || 'Failed to initialize payment.',

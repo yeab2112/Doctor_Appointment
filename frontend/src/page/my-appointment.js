@@ -2,13 +2,10 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { AppContext } from '../component/context.js';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import {  useLocation } from 'react-router-dom';
 
 function MyAppointment() {
   const { token, getDoctors } = useContext(AppContext);
   const [appointments, setAppointments] = useState([]);
-  // const navigate = useNavigate();
-  const location = useLocation(); // Using useLocation to track URL changes
 
   // Fetch appointments
   const getMyAppointment = useCallback(async () => {
@@ -30,7 +27,7 @@ function MyAppointment() {
       }
     } catch (error) {
       console.error('Error fetching appointments:', error);
-      toast.error(error?.response?.data?.message || 'An error occurred while fetching appointments');
+      toast.error(error?.response?.data?.message || "");
     }
   }, [token]);
 
@@ -61,27 +58,35 @@ function MyAppointment() {
       toast.error(error.response?.data?.message);
     }
   };
-  
+
 
   // Handle payment
   const handlePayment = async (appointmentId) => {
+    const txRef = `tx-${Date.now()}`;  // Generate a unique transaction reference
+  
+    // Store txRef and appointmentId in localStorage
+    localStorage.setItem('txRef', txRef);
+    localStorage.setItem('appointmentId', appointmentId);
+  
     const paymentData = {
       currency: 'ETB',
-      phone: '0923547840', // Replace with actual phone number
-      txRef: `tx-${Date.now()}`, // Unique transaction reference
-      callbackUrl: 'http://localhost:5001/api/user/verify', // Backend callback URL for verification
+      phone: '0923547840',  // Replace with actual phone number
+      txRef: txRef,  // Unique transaction reference
+      callbackUrl: 'http://localhost:5001/api/user/verify-payment',  // Backend callback URL for verification
     };
-
+  
     try {
+      // Send the payment data and appointmentId to the backend
       const { data } = await axios.post(
-        'http://localhost:5001/api/user/payment-appointment',
-        { appointmentId, ...paymentData },
-        { headers: { Authorization: `Bearer ${token}` } }
+        'http://localhost:5001/api/user/payment-appointment',  // Backend endpoint
+        { appointmentId, ...paymentData },  // Include appointmentId and other payment details
+        { headers: { Authorization: `Bearer ${token}` } }  // Include token for authorization (if needed)
       );
-
+  
+      // If payment is successfully initiated, redirect to the Chapa payment page
       if (data?.status === 'success') {
         toast.success('Redirecting to payment gateway...');
-        window.location.href = data.checkoutUrl; // Redirect to Chapa payment page
+        window.location.href = data.checkoutUrl;  // Redirect to Chapa's checkout page
       } else {
         toast.error(data?.message || 'Failed to initiate payment');
       }
@@ -90,19 +95,18 @@ function MyAppointment() {
       toast.error(error?.response?.data?.message || 'An error occurred while initiating payment');
     }
   };
+  
 
   // Payment verification logic
   useEffect(() => {
-    // Using useLocation to get query parameters instead of window.location.search
-    const queryParams = new URLSearchParams(location.search);
-    const txRef = queryParams.get('tx_ref');
-    const appointmentId = queryParams.get('appointment_id');
+    const txRef = localStorage.getItem('txRef');
+    const appointmentId = localStorage.getItem('appointmentId');
 
     if (!txRef || !appointmentId) {
       toast.error('Transaction reference or appointment ID not found.');
       return;
     }
-
+// payment verification
     const verifyPayment = async () => {
       try {
         const { data } = await axios.post(
@@ -123,7 +127,7 @@ function MyAppointment() {
     };
 
     verifyPayment();
-  }, [location.search, token]); // Now location.search is the correct dependency
+  }, [token]);; // Now location.search is the correct dependency
 
   // Render appointments
   return (
@@ -162,34 +166,43 @@ function MyAppointment() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col gap-4">
-                  {!item.cancelled && item.payment && !item.isCompleted && (
-                    <button disabled className="bg-green-500 text-white px-4 py-2 rounded-lg">
-                      Paid
-                    </button>
-                  )}
-                  {!item.cancelled && !item.payment && !item.isCompleted && (
-                    <>
-                      <button
-                        onClick={() => handlePayment(item._id)} // Payment functionality
-                        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-                      >
-                        Pay Online
-                      </button>
-                      <button
-                      onClick={() => cancelAppointment(item._id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                    >
-                      Cancel
-                    </button>
-                    </>
-                  )}
-                  {item.cancelled && (
-                    <button disabled className="border border-red-500 text-red-500 px-4 py-2 rounded-lg">
-                      Appointment Canceled
-                    </button>
-                  )}
-                </div>
+<div className="flex flex-col items-center gap-4">
+  {!item.cancelled && item.payment && !item.isCompleted && (
+    <button disabled className="bg-green-500 text-white px-4 py-2 rounded-lg">
+      Paid
+    </button>
+  )}
+
+  {item.isCompleted && (
+    <span className="text-green-500 px-4 py-2 rounded-lg">
+      Completed
+    </span>
+  )}
+
+  {!item.cancelled && !item.payment && !item.isCompleted && (
+    <>
+      <button
+        onClick={() => handlePayment(item._id)} // Payment functionality
+        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+      >
+        Pay Online
+      </button>
+      <button
+        onClick={() => cancelAppointment(item._id)}
+        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+      >
+        Cancel
+      </button>
+    </>
+  )}
+  
+  {item.cancelled && (
+    <button disabled className="border border-red-500 text-red-500 px-4 py-2 rounded-lg">
+      Appointment Canceled
+    </button>
+  )}
+</div>
+
               </div>
             );
           })

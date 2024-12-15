@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -25,11 +25,12 @@ const ContextProvider = (props) => {
   };
 
   // Fetch user profile data
-  const loadUserProfileData = async () => {
+  const loadUserProfileData = useCallback(async () => {
     try {
       const { data } = await axios.get('http://localhost:5001/api/user/get-profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
       if (data.success) {
         setUserData(data.userData);
       } else {
@@ -39,16 +40,16 @@ const ContextProvider = (props) => {
       console.error(error);
       toast.error(error.response?.data?.message || 'Failed to fetch user profile');
     }
-  };
+  }, [token]);  // Adding token as a dependency to rerun if token changes
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem('token', token); 
-      loadUserProfileData(); 
+      localStorage.setItem('token', token);
+      loadUserProfileData(); // Call the memoized function here
     } else {
       setUserData(null);
     }
-  }, [token]); 
+  }, [token, loadUserProfileData]); // Effect depends on token and loadUserProfileData
 
   const value = {
     doctors,
