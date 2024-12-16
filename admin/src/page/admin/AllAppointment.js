@@ -4,7 +4,7 @@ import { AppContext } from "../../context/appContext";
 import cross from "../../asset/cross.png";
 
 function AllAppointment() {
-  const { aToken, appointments, getAppointment, cancelAppointment, completeAppointment } = useContext(AdminContext);
+  const { aToken, appointments, getAppointment, cancelAppointment} = useContext(AdminContext);
   const { calculateAge } = useContext(AppContext);
 
   // Fetch appointments only when `aToken` changes

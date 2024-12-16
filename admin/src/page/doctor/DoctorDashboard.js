@@ -1,6 +1,6 @@
 import React ,{useContext,useEffect}from 'react'
 import { DoctorContext } from '../../context/doctorContext';
-import earning from "../../asset/earning.png"; // Assuming this exists
+import earning from "../../asset/earning.png"; 
 import appointment from "../../asset/appointment.png";
 import patient from "../../asset/patient.png";
 import list from "../../asset/list.png";
@@ -92,13 +92,13 @@ function DoctorDashboard() {
                       : <div className="w-32 text-center">
                         <div className="flex gap-3 items-center justify-center">
                           <img
-                            onClick={() => cancelAppointment(item._id)}  // Corrected: wrapped in a function
+                            onClick={() => cancelAppointment(item._id)}  
                             src={cross}
                             alt="Delete"
                             className="w-5 h-5 cursor-pointer hover:scale-105 transition-transform text-red-600"
                           />
                           <img
-                            onClick={() => completeAppointment(item._id)}  // Corrected: wrapped in a function
+                            onClick={() => completeAppointment(item._id)}  
                             src={tick}
                             alt="Confirm"
                             className="w-5 h-5 cursor-pointer hover:scale-105 transition-transform text-green-600"

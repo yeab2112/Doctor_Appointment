@@ -134,12 +134,12 @@ const appintmmentAdmin = async (req, res) => {
   .populate('userId', 'name image dob ') // Populating specific fields of the user.
   .populate('docId', 'name image  '); // Populating specific fields of the user.
 
-    console.log("Fetched appointments:", appointments); // Debugging: logs the fetched appointments
+    console.log("Fetched appointments:", appointments); 
 
     
     return res.status(200).json({ success: true, appointments });
   } catch (error) {
-    console.error("Error fetching appointments:", error); // Detailed error logging
+    console.error("Error fetching appointments:", error); 
     return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };

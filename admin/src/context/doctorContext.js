@@ -103,7 +103,7 @@ const DoctorContextProvider = (props) => {
     }
   }, [dToken, Backend_url]);
 //  get doctor profile
-const loadDoctorProfileData = async () => {
+const loadDoctorProfileData = useCallback(async () => {
   try {
     const { data } = await axios.get(`${Backend_url}/api/doctor/profile`, {
       headers: { Authorization: `Bearer ${dToken}` },
@@ -118,7 +118,7 @@ const loadDoctorProfileData = async () => {
     console.error("Error fetching profile:", error);
     toast.error(error.response?.data?.message || "Failed to fetch doctor profile");
   }
-};
+}, [dToken, Backend_url, setDocData]);
 
   const value = {
     dToken,

@@ -10,7 +10,7 @@ function DoctorProfile() {
     if (dToken) {
       loadDoctorProfileData();
     }
-  }, [dToken]);
+  }, [dToken,loadDoctorProfileData]);
 
   useEffect(() => {
     if (docData) {
@@ -51,7 +51,6 @@ function DoctorProfile() {
         // Optionally reload the doctor profile data if needed
         loadDoctorProfileData();
       } else {
-        // Handle error (e.g., show error message)
         console.error('Failed to update doctor profile:', data.message);
       }
     } catch (error) {

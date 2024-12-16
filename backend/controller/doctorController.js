@@ -79,9 +79,8 @@ const doctorLogin = async (req, res) => {
     const appointmentCompleted = async (req, res) => {
       try {
         const docId = req.docId;
-        const { appointmentId } = req.body;  // Destructure to get appointmentId
+        const { appointmentId } = req.body;  
         
-        // Use findOne to get the specific appointment by appointmentId
         const appointmentData = await Appointment.findById(appointmentId );
     
         if (appointmentData && appointmentData.docId.toString() === docId) {
@@ -100,9 +99,8 @@ const doctorLogin = async (req, res) => {
     const appointmentCancelled = async (req, res) => {
       try {
         const docId = req.docId;
-        const { appointmentId } = req.body;  // Destructure to get appointmentId
+        const { appointmentId } = req.body;  
         
-        // Use findOne to get the specific appointment by appointmentId
         const appointmentData = await Appointment.findById(appointmentId );
     
         if (appointmentData && appointmentData.docId.toString() === docId) {

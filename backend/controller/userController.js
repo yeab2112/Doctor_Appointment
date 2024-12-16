@@ -248,7 +248,6 @@ const myAppointment = async (req, res) => {
 };
 const cancelAppointment = async (req, res) => {
   try {
-    // Ensure userId is extracted correctly
     const userId = req.userId; // Assuming this is set by middleware
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized access" });

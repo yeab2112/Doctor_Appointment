@@ -4,9 +4,10 @@ import profile from "../../asset/profile.png";
 import appointment from "../../asset/appointment.png";
 import patient from "../../asset/patient.png";
 import list from "../../asset/list.png";
+import cross from "../../asset/cross.png";
 
 function Dashboard() {
-  const { getDashBoard, dashData, aToken, getAppointment } = useContext(AdminContext);
+  const { getDashBoard, dashData, aToken, getAppointment, cancelAppointment } = useContext(AdminContext);
 
   useEffect(() => {
     if (aToken) {
@@ -60,13 +61,13 @@ function Dashboard() {
                 <div key={index} className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
                   <div className="flex items-center">
                     <img
-                      src={item.docId.image || profile}
+                      src={item.docId?.image || profile}
                       alt={`Doctor ${index + 1}`}
                       className="w-12 h-12 rounded-full mr-4"
                     />
                     <div>
                       <p className="text-sm text-gray-700 font-medium">
-                        {item.docId.name || "Unknown Doctor"}
+                        {item.docId?.name || "Unknown Doctor"}
                       </p>
                       <p className="text-xs text-gray-500">
                         {item.date} - {item.slotTime}
@@ -74,12 +75,26 @@ function Dashboard() {
                     </div>
                   </div>
                   <div>
-                    {/* Display Completed Text */}
+                    {/* Cancel Button */}
+                    {!item.cancelled && !item.isCompleted && (
+                      <button
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                        aria-label={`Cancel appointment ${item._id}`}
+                        onClick={() => cancelAppointment(item._id)}
+                      >
+                        <img
+                          src={cross}
+                          alt="Cancel"
+                          className="w-5 h-5 inline"
+                        />
+                      </button>
+                    )}
+                    {/* Completed Label */}
                     {item.isCompleted && (
                       <span className="text-green-500 text-sm mt-2">Completed</span>
                     )}
-                    {/* Display Canceled Text only if not completed */}
-                    {!item.isCompleted && item.cancelled && (
+                    {/* Canceled Label */}
+                    {item.cancelled && !item.isCompleted && (
                       <span className="text-red-500 text-sm mt-2">Canceled</span>
                     )}
                   </div>

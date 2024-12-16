@@ -112,8 +112,7 @@ const AdminContextProvider = ({ children }) => {
       if (response.status === 200) {
         // Update doctors state with the new availability
         const updatedDoctors = doctors.map((doctor) =>
-          doctor._id === doctorId ? { ...doctor, available: newAvailability } : doctor
-        );
+          doctor._id === doctorId ? { ...doctor, available: newAvailability } : doctor );
         setDoctors(updatedDoctors);
         toast.success('Availability updated successfully');
       } else {
@@ -135,7 +134,7 @@ const AdminContextProvider = ({ children }) => {
     cancelAppointment,
     getDashBoard,
     dashData,
-    changeAvailability, // Provide the function to toggle availability
+    changeAvailability, 
   };
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;

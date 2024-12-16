@@ -8,8 +8,8 @@ const authDoctor = (req, res, next) => {
     }
 
     const decoded = jwt.verify(dToken, process.env.JWT_SECRETS);
-    req.docId = decoded.id; // Ensure the payload contains 'id'
-    console.log("Decoded Token Payload:", decoded); // Debugging
+    req.docId = decoded.id; 
+    console.log("Decoded Token Payload:", decoded); 
     next();
   } catch (error) {
     console.error("Auth Error:", error.message); // Debugging

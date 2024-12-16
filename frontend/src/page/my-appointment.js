@@ -62,42 +62,49 @@ function MyAppointment() {
 
   // Handle payment
   const handlePayment = async (appointmentId) => {
-    const txRef = `tx-${Date.now()}`;  // Generate a unique transaction reference
+    const txRef = `tx-${Date.now()}`; // Generate a unique transaction reference
   
-    // Store txRef and appointmentId in localStorage
     localStorage.setItem('txRef', txRef);
     localStorage.setItem('appointmentId', appointmentId);
   
+    // Prevent the function from being triggered again while the payment is being processed
+    if (localStorage.getItem('paymentInProgress') === 'true') {
+      toast.warning('Payment is already in progress...');
+      return;
+    }
+  
+    localStorage.setItem('paymentInProgress', 'true'); // Mark that payment is in progress
+  
     const paymentData = {
       currency: 'ETB',
-      phone: '0923547840',  // Replace with actual phone number
-      txRef: txRef,  // Unique transaction reference
-      callbackUrl: 'http://localhost:5001/api/user/verify-payment',  // Backend callback URL for verification
+      phone: '0923547840', // Replace with actual phone number
+      txRef: txRef, // Unique transaction reference
+      callbackUrl: 'http://localhost:5001/api/user/verify-payment', // Backend callback URL for verification
     };
   
     try {
-      // Send the payment data and appointmentId to the backend
       const { data } = await axios.post(
-        'http://localhost:5001/api/user/payment-appointment',  // Backend endpoint
-        { appointmentId, ...paymentData },  // Include appointmentId and other payment details
-        { headers: { Authorization: `Bearer ${token}` } }  // Include token for authorization (if needed)
+        'http://localhost:5001/api/user/payment-appointment', 
+        { appointmentId, ...paymentData }, 
+        { headers: { Authorization: `Bearer ${token}` } } 
       );
   
       // If payment is successfully initiated, redirect to the Chapa payment page
       if (data?.status === 'success') {
         toast.success('Redirecting to payment gateway...');
-        window.location.href = data.checkoutUrl;  // Redirect to Chapa's checkout page
+        window.location.href = data.checkoutUrl; // Redirect to Chapa's checkout page
       } else {
         toast.error(data?.message || 'Failed to initiate payment');
       }
     } catch (error) {
       console.error('Error initiating payment:', error);
       toast.error(error?.response?.data?.message || 'An error occurred while initiating payment');
+    } finally {
+      // Reset the payment progress state after the operation
+      localStorage.setItem('paymentInProgress', 'false');
     }
   };
-  
-
-  // Payment verification logic
+  // verifyPayment
   useEffect(() => {
     const txRef = localStorage.getItem('txRef');
     const appointmentId = localStorage.getItem('appointmentId');
@@ -106,7 +113,14 @@ function MyAppointment() {
       toast.error('Transaction reference or appointment ID not found.');
       return;
     }
-// payment verification
+
+    // Check if payment verification has already been done for this txRef
+    const isVerified = localStorage.getItem(`paymentVerified_${txRef}`);
+    if (isVerified) {
+      return;  // If already verified, don't proceed further
+    }
+
+    // payment verification
     const verifyPayment = async () => {
       try {
         const { data } = await axios.post(
@@ -117,6 +131,8 @@ function MyAppointment() {
 
         if (data?.status === 'success') {
           toast.success('Payment verified successfully!');
+          localStorage.setItem(`paymentVerified_${txRef}`, 'true');
+          getMyAppointment() // Mark the transaction as verified
         } else {
           toast.error(data?.message || 'Payment verification failed.');
         }
@@ -127,9 +143,8 @@ function MyAppointment() {
     };
 
     verifyPayment();
-  }, [token]);; // Now location.search is the correct dependency
+  }, [token]); 
 
-  // Render appointments
   return (
     <div className="container mx-auto p-4">
       <p className="text-2xl font-bold text-center mb-4">My Appointments</p>

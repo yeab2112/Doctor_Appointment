@@ -10,9 +10,9 @@ function Login() {
   const { setDToken } = useContext(DoctorContext);
 
   const [state, setState] = useState('Admin'); // Toggle between Admin and Doctor login
-  const [email, setEmail] = useState(''); // Store email input
-  const [password, setPassword] = useState(''); // Store password input
-  const [loading, setLoading] = useState(false); // Manage loading state
+  const [email, setEmail] = useState(''); 
+  const [password, setPassword] = useState(''); 
+  const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -26,7 +26,7 @@ function Login() {
       return;
     }
 
-    const endpoint = `${Backend_url}/api/${state.toLowerCase()}/login`; // Endpoint based on state
+    const endpoint = `${Backend_url}/api/${state.toLowerCase()}/login`; 
     const body = { email, password };
 
     try {
