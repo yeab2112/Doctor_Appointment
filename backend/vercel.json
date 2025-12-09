@@ -2,12 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.js",
+      "src": "server/index.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
-          "routers/**",
-          "config/**"
+          "server/router/**",
+          "server/config/**",
+          "server/controller/**",
+          "server/middleware/**",
+          "server/moduls/**"
         ]
       }
     }
@@ -15,19 +18,11 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      "dest": "index.js",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Max-Age": "86400"
-      }
+      "dest": "server/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "index.js"
+      "dest": "server/index.js"
     }
   ]
 }
