@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { AppContext } from "../component/context";
-import Profile from "../asset/Profile.png"; // Default image
+import profile from "../asset/profile.png"; // Default image
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import CSS for toast notifications
 
@@ -20,8 +20,6 @@ formData.append("address", JSON.stringify(userData.address));
 if (image) {
   formData.append("image", image);
 }
-
-
 
       const response = await fetch("http://localhost:5001/api/user/update-profile", {
         method: "PUT",
@@ -61,7 +59,8 @@ if (image) {
             src={
               image
                 ? URL.createObjectURL(image)
-                : userData.image || Profile
+
+                : userData.image || profile
             }
             alt="Profile"
             className="w-32 h-32 rounded-full mx-auto border-4 border-gray-200"

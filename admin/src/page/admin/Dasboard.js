@@ -1,6 +1,8 @@
 import React, { useContext, useEffect } from "react";
 import { AdminContext } from "../../context/adminContext";
-import Profile from "../../asset/Profile.png";
+
+
+import profile from "../../asset/profile.png";
 import appointment from "../../asset/appointment.png";
 import patient from "../../asset/patient.png";
 import list from "../../asset/list.png";
@@ -23,7 +25,8 @@ function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {/* Doctors Section */}
           <div className="bg-white p-4 rounded-lg shadow-lg flex items-center cursor-pointer hover:shadow-xl hover:bg-gray-50 active:scale-95 transition-all">
-            <img src={Profile} alt="Doctors" className="w-16 h-16 rounded-full mr-4" />
+
+            <img src={profile} alt="Doctors" className="w-16 h-16 rounded-full mr-4" />
             <div>
               <p className="text-lg font-bold">{dashData.doctors || 0}</p>
               <p className="text-sm text-gray-600">Doctors</p>
@@ -61,7 +64,8 @@ function Dashboard() {
                 <div key={index} className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
                   <div className="flex items-center">
                     <img
-                      src={item.docId?.image || Profile}
+
+                      src={item.docId?.image || profile}
                       alt={`Doctor ${index + 1}`}
                       className="w-12 h-12 rounded-full mr-4"
                     />
