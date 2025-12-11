@@ -2,27 +2,28 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/index.js",
+      "src": "index.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
-          "server/router/**",
-          "server/config/**",
-          "server/controller/**",
-          "server/middleware/**",
-          "server/moduls/**"
+          "router/**",
+          "config/**"
         ]
       }
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "index.js"
-    },
-    {
       "src": "/(.*)",
-      "dest": "index.js"
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+      "dest": "index.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://ecommerce-client-lake.vercel.app",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS,PATCH",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Max-Age": "86400"
+      }
     }
   ]
 }
