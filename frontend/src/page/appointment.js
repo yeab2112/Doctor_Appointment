@@ -86,7 +86,7 @@ function Appointment() {
 
       try {
         const { data } = await axios.post(
-          'https://doctor-appointmentm.vercel.app/user/book-appointment',
+          'https://doctor-appointmentm.vercel.app/api/user/book-appointment',
           {
             userDate: new Date(), 
             docDate: date,
