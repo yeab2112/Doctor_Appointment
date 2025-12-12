@@ -20,14 +20,19 @@ const Header = () => {
         <a href="#specialty" class="flex items-center justify-center 
         space-x-2 px-4 py-2 w-fit bg-white text-black text-sm rounded-full 
         transition-colors duration-200 ease-in-out hover:bg-blue-600 hover:text-white">
-    <span>Book Appointment</span>
-    <img src={arrow} alt="arrow" class="w-4 h-4"/>
-</a>
+          <span>Book Appointment</span>
+          <img src={arrow} alt="arrow" class="w-4 h-4" />
+        </a>
 
       </div>
       {/* Right side */}
       <div className=" w-full md:w-1/2 items-center relative">
-        <img src={headers} alt="Header Illustration" className="w-full bottom-2 h-auto  rounded-lg shadow-lg" />
+        <img
+          src={headers}
+          alt="Header Illustration"
+          className="w-full h-[200px] object-cover rounded-lg shadow-lg"
+        />
+
       </div>
     </div>
   );
