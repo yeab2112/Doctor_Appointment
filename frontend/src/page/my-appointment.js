@@ -16,7 +16,7 @@ function MyAppointment() {
 
     try {
       const { data } = await axios.get(
-        'http://localhost:5001/api/user/get-appointment',
+        'https://doctor-appointmentm.vercel.app/api/user/get-appointment',
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -41,7 +41,7 @@ function MyAppointment() {
   const cancelAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
-        'http://localhost:5001/api/user/cancel-appointment',
+        'https://doctor-appointmentm.vercel.app/api/user/cancel-appointment',
         { appointmentId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -79,12 +79,12 @@ function MyAppointment() {
       currency: 'ETB',
       phone: '0923547840', // Replace with actual phone number
       txRef: txRef, // Unique transaction reference
-      callbackUrl: 'http://localhost:5001/api/user/verify-payment', // Backend callback URL for verification
+      callbackUrl: 'https://doctor-appointmentm.vercel.app/api/user/verify-payment', // Backend callback URL for verification
     };
   
     try {
       const { data } = await axios.post(
-        'http://localhost:5001/api/user/payment-appointment', 
+        'https://doctor-appointmentm.vercel.app/api/user/payment-appointment', 
         { appointmentId, ...paymentData }, 
         { headers: { Authorization: `Bearer ${token}` } } 
       );
@@ -124,7 +124,7 @@ function MyAppointment() {
     const verifyPayment = async () => {
       try {
         const { data } = await axios.post(
-          'http://localhost:5001/api/user/verify',
+          'https://doctor-appointmentm.vercel.app/api/user/verify',
           { txRef, appointmentId },
           { headers: { Authorization: `Bearer ${token}` } }
         );

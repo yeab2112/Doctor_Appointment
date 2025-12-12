@@ -7,7 +7,7 @@ export const AdminContext = createContext();
 
 const AdminContextProvider = ({ children }) => {
   const [aToken, setAToken] = useState(localStorage.getItem('aToken') || '');
-  const Backend_url = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
+  const Backend_url = process.env.REACT_APP_BACKEND_URL || 'https://doctor-appointmentm.vercel.app';
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState([]);

@@ -17,9 +17,9 @@ function Login() {
     try {
       let response;
       if (state === "Sign Up") {
-        response = await axios.post("http://localhost:5001/api/user/register", { name, email, password });
+        response = await axios.post("https://doctor-appointmentm.vercel.app/api/user/register", { name, email, password });
       } else {
-        response = await axios.post("http://localhost:5001/api/user/login", { email, password });
+        response = await axios.post("https://doctor-appointmentm.vercel.app/api/user/login", { email, password });
       }
 
       if (response.status === 200 && response.data.success) {

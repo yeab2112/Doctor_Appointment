@@ -12,7 +12,7 @@ const ContextProvider = (props) => {
   // Fetch doctors
   const getDoctors = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5001/api/doctor/list');
+      const { data } = await axios.get('https://doctor-appointmentm.vercel.app/api/doctor/list');
       if (data.success) {
         setDoctors(data.doctors);
       } else {
@@ -27,7 +27,7 @@ const ContextProvider = (props) => {
   // Fetch user profile data
   const loadUserProfileData = useCallback(async () => {
     try {
-      const { data } = await axios.get('http://localhost:5001/api/user/get-profile', {
+      const { data } = await axios.get('https://doctor-appointmentm.vercel.app/api/user/get-profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
       

@@ -21,7 +21,7 @@ if (image) {
   formData.append("image", image);
 }
 
-      const response = await fetch("http://localhost:5001/api/user/update-profile", {
+      const response = await fetch("https://doctor-appointmentm.vercel.app/api/user/update-profile", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

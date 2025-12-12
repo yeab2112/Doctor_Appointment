@@ -11,7 +11,7 @@ const DoctorContextProvider = (props) => {
   const [docData, setDocData] = useState([]);
 
   const [loading, setLoading] = useState(false); // Add loading state
-  const Backend_url = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
+  const Backend_url = process.env.REACT_APP_BACKEND_URL || 'https://doctor-appointmentm.vercel.app';
 
   // Fetch appointments
   const getAppointment = useCallback(async () => {
