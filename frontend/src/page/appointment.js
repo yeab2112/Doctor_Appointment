@@ -85,7 +85,7 @@ function Appointment() {
       const slotDate = date.toISOString().split('T')[0].replace(/-/g, '_'); 
 
       try {
-        const { data } = await axios.post('https://doctor-appointmentm.vercel.app/api/user/book-appointment',
+       const { data } = await axios.post('https://doctor-appointmentm.vercel.app/api/user/book-appointment',
           {
             userDate: new Date(), 
             docDate: date,
