@@ -332,7 +332,7 @@ const initiateAppointmentPayment = async (req, res) => {
     currency: currency || 'ETB', 
     phone: phone,
     tx_ref: txRef,
-     return_url: 'http://localhost:3000/my-appointment',
+     return_url: 'https://doctor-appointment-fron.vercel.app/my-appointment',
     callback_url: callbackUrl,
     appointmentId,
     appointmentDate,
