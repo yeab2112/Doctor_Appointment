@@ -30,7 +30,8 @@ const Header = () => {
         <img
           src={headers}
           alt="Header Illustration"
-          className="w-full h-[200px] object-cover rounded-lg shadow-lg"
+         className="w-full h-[350px] object-cover rounded-lg shadow-lg"
+
         />
 
       </div>

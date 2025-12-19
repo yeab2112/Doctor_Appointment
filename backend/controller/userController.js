@@ -297,69 +297,91 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
+const CHAPA_API_URL = 'https://api.chapa.co/v1/transaction/initialize';
 const CHAPA_SECRET_KEY = "CHASECK_TEST-Zx9WYTlcvbOsbvqOMLbDclIchCwINaHP";
 
 const initiateAppointmentPayment = async (req, res) => {
+  const { phone, currency, txRef, callbackUrl, appointmentId } = req.body;
+
+  // Ensure all required fields are present
+  if (!phone || !txRef || !callbackUrl) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Missing required fields: phone, txRef, or callbackUrl',
+    });
+  }
+
+  // Find appointment by ID
+  const appointment = await Appointment.findById(appointmentId);
+
+  if (!appointment) {
+    return res.status(404).json({ success: false, message: 'Appointment not found' });
+  }
+
+  const appointmentDate = appointment.date ? new Date(appointment.date).toISOString() : 'N/A';
+
+  const title = 'Doctor Apt'; // Title must be ≤ 16 characters
+  let description = `Payment for appointment on ${appointment.date}`;
+
+  description = description.replace(/[^a-zA-Z0-9-_ .]/g, ''); // Only allow letters, numbers, hyphens, underscores, spaces, and dots
+  description = description.slice(0, 50); // Ensure description is ≤ 50 characters
+
+  // Construct the payment data
+  const paymentData = {
+    amount: appointment.amount * 100, // Amount should be in cents
+    currency: currency || 'ETB', 
+    phone: phone,
+    tx_ref: txRef,
+     return_url: 'https://doctor-appointment-fron.vercel.app/my-appointment',
+    callback_url: callbackUrl,
+    appointmentId,
+    appointmentDate,
+    customization: {
+      title: title,
+      description: description,
+    },
+  };
+
+  console.log('Payment Data:', paymentData); 
+
   try {
-    const { appointmentId } = req.body;
-
-    const appointment = await Appointment.findById(appointmentId)
-      .populate("userId", "name email");
-
-    if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found" });
-    }
-
-    const [first_name, ...rest] = appointment.userId.name.split(" ");
-    const last_name = rest.join(" ") || "User";
-
-    const txRef = `APT-${appointmentId}-${Date.now()}`;
-
-    const paymentData = {
-      amount: appointment.amount, // ❗ NO *100
-      currency: "ETB",
-      email: appointment.userId.email,
-      first_name,
-      last_name,
-      tx_ref: txRef,
-      return_url: "https://doctor-appointment-fron.vercel.app/my-appointment",
-      customization: {
-        title: "Doctor Apt",
-        description: "Doctor appointment payment",
+    // Send request to Chapa API
+    const response = await axios.post(CHAPA_API_URL, paymentData, {
+      headers: {
+        Authorization: `Bearer ${CHAPA_SECRET_KEY}`,
+        'Content-Type': 'application/json',
       },
-    };
-
-    const response = await axios.post(
-      "https://api.chapa.co/v1/transaction/initialize",
-      paymentData,
-      {
-        headers: {
-          Authorization: `Bearer ${CHAPA_SECRET_KEY}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    return res.status(200).json({
-      status: "success",
-      checkoutUrl: response.data.data.checkout_url,
-      tx_ref: txRef,
-      appointmentId,
     });
 
-  } catch (error) {
-    console.error(
-      "Chapa error:",
-      error.response?.data || error.message
-    );
+    console.log('Chapa API Response:', response.data);
 
-    return res.status(500).json({
-      status: "error",
-      message: "Payment initiation failed",
-      error: error.response?.data || error.message,
+    if (response.data.status === 'success') {
+      res.status(200).json({
+        status: 'success',
+        checkoutUrl: response.data.data.checkout_url, // Chapa's checkout URL
+        appointmentId, // Include appointmentId
+        tx_ref:txRef,         // Include txRef
+      });
+    }
+    
+      
+     else {
+      res.status(400).json({
+        status: 'fail',
+        message: response.data.message || 'Failed to initialize payment.',
+      });
+    }
+  } catch (error) {
+    console.error('Error initiating payment:', error.response ? error.response.data : error.message); // Log error response from Chapa
+    res.status(500).json({
+      status: 'error',
+      message: 'Payment initiation failed',
+      error: error.message,
     });
   }
 };
+
+
 
 const verifyAppointmentPayment = async (req, res) => {
   const { txRef, appointmentId } = req.body;  
